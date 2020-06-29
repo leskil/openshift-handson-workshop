@@ -9,7 +9,10 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/leskil/openshift-handson-workshop/pkg/config"
 )
+
+var authKey string
 
 type timeResponse struct {
 	UnixDate string
@@ -17,6 +20,15 @@ type timeResponse struct {
 }
 
 func main() {
+
+	key, err := config.AuthKey()
+
+	if err != nil {
+		panic(err)
+	} else {
+		authKey = key
+	}
+
 	r := mux.NewRouter()
 	r.HandleFunc("/time", timeHandler)
 
@@ -32,6 +44,12 @@ func main() {
 func timeHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("%s\t%s", r.Method, r.URL)
+
+	if r.URL.Query().Get("auth") != authKey {
+		log.Println("Invalid auth key")
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
 
 	now := time.Now()
 	host, _ := os.Hostname()
