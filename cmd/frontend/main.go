@@ -25,7 +25,7 @@ type viewModel struct {
 
 func main() {
 
-	log.Println("Frontend web server running...")
+	log.Println("Frontend web server running on port 8081...")
 
 	http.HandleFunc("/", renderTemplate)
 	http.ListenAndServe(":8081", nil)
