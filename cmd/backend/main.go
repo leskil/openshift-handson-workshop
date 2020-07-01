@@ -77,5 +77,5 @@ func AuthKey() (string, error) {
 		return key, nil
 	}
 
-	return "", errors.New("Environment variable AUTH_KEY does not exist")
+	return "", errors.New("Environment variable AUTH_KEY does not exist. Set this to whatever value you want, and make sure that the frontend use the same value when calling the backend service.")
 }
