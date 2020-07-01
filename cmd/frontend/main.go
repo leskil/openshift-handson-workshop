@@ -8,8 +8,6 @@ import (
 	"net/http"
 	"os"
 	"text/template"
-
-	"github.com/leskil/openshift-handson-workshop/pkg/config"
 )
 
 type backendResponse struct {
@@ -57,7 +55,7 @@ func renderTemplate(w http.ResponseWriter, r *http.Request) {
 }
 
 func callBackend() (*backendResponse, error) {
-	key, err := config.AuthKey()
+	key, err := AuthKey()
 
 	if err != nil {
 		return nil, err
@@ -97,4 +95,15 @@ func backendEndpoint() string {
 	}
 
 	return endp
+}
+
+// AuthKey reads the environment variable AUTH_KEY or returns an error.
+func AuthKey() (string, error) {
+	key := os.Getenv("AUTH_KEY")
+
+	if key != "" {
+		return key, nil
+	}
+
+	return "", errors.New("Environment variable AUTH_KEY does not exist. Make sure it's using the same value as the backend service.")
 }
