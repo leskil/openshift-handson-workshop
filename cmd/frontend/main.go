@@ -67,11 +67,12 @@ func callBackend() (*backendResponse, error) {
 	url := backendEndpoint() + "/time" + "?auth=" + key
 	resp, err := http.Get(url)
 
-	log.Printf("Response from %s: %s", url, resp.Status)
-
 	if err != nil {
+		log.Println(err.Error())
 		return nil, err
 	}
+
+	log.Printf("Response from %s: %s", url, resp.Status)
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
