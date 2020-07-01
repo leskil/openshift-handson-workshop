@@ -16,11 +16,12 @@ type backendResponse struct {
 }
 
 type viewModel struct {
-	Title        string
-	UnixDate     string
-	FrontendHost string
-	BackendHost  string
-	AuthKey      string
+	Title           string
+	UnixDate        string
+	FrontendHost    string
+	BackendHost     string
+	AuthKey         string
+	BackendEndpoint string
 }
 
 func main() {
@@ -41,14 +42,16 @@ func renderTemplate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("layout.html"))
+	//tmpl := template.Must(template.ParseFiles("layout.html"))
+	tmpl := template.Must(template.New("layout").Parse(html()))
 	host, _ := os.Hostname()
 	vm := viewModel{
-		Title:        "Testing layout",
-		UnixDate:     data.UnixDate,
-		FrontendHost: host,
-		BackendHost:  data.Host,
-		AuthKey:      os.Getenv("AUTH_KEY"),
+		Title:           "Testing layout",
+		UnixDate:        data.UnixDate,
+		FrontendHost:    host,
+		BackendHost:     data.Host,
+		AuthKey:         os.Getenv("AUTH_KEY"),
+		BackendEndpoint: os.Getenv("BACKEND_ENDPOINT"),
 	}
 
 	tmpl.Execute(w, vm)
@@ -106,4 +109,62 @@ func AuthKey() (string, error) {
 	}
 
 	return "", errors.New("Environment variable AUTH_KEY does not exist. Make sure it's using the same value as the backend service.")
+}
+
+func html() string {
+	return `<!DOCTYPE html>
+	<html>
+	
+	<head>
+		<title>OpenShift hands on</title>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" type="text/css"
+			href="https://cdnjs.cloudflare.com/ajax/libs/patternfly/3.24.0/css/patternfly.min.css">
+		<link rel="stylesheet" type="text/css"
+			href="https://cdnjs.cloudflare.com/ajax/libs/patternfly/3.24.0/css/patternfly-additions.min.css">
+	
+	</head>
+	
+	<body style="background-color: rgb(245, 245, 245); padding: 20px;">
+		<div class="container">
+			<div class="row row-cards-pf">
+				<h1 style="text-align: center; margin-bottom: 20px">OpenShift hands-on frontend</h1>
+				<div class="card-pf">
+					<h1 class="card-pf-title">Configuration</h1>
+					<div class="card-pf-body">
+						<p>
+						<dl>
+							<dt>Frontend host/pod:</dt>
+							<dd>{{.FrontendHost}}</dd>
+							<dt>Auth key:</dt>
+							<dd>{{.AuthKey}}</dd>
+							<dt>Endpoint:</dt>
+							<dd>{{.BackendEndpoint}}</dd>                        
+						</dl>
+						</p>
+					</div>
+				</div>
+	
+				<div class="card-pf">
+					<h1 class="card-pf-title">Backend service results</h1>
+					<div class="card-pf-body">
+						<p>
+						<dl>
+							<dt>UnixTime:</dt>
+							<dd>{{.UnixDate}}</dd>
+							<dt>Backend host/pod:</dt>
+							<dd>{{.BackendHost}}</dd>
+						</dl>
+						</p>
+					</div>
+				</div>
+	
+			</div>
+		</div>
+		</div>
+	</body>
+	
+	</html>
+
+`
 }
