@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,7 +10,6 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/leskil/openshift-handson-workshop/pkg/config"
 )
 
 var authKey string
@@ -21,7 +21,7 @@ type timeResponse struct {
 
 func main() {
 
-	key, err := config.AuthKey()
+	key, err := AuthKey()
 
 	if err != nil {
 		panic(err)
@@ -67,4 +67,15 @@ func timeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write(json)
+}
+
+// AuthKey reads the environment variable AUTH_KEY or returns an error.
+func AuthKey() (string, error) {
+	key := os.Getenv("AUTH_KEY")
+
+	if key != "" {
+		return key, nil
+	}
+
+	return "", errors.New("Environment variable AUTH_KEY does not exist")
 }
